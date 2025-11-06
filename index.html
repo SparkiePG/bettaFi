@@ -3,102 +3,245 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Universal Token Login</title>
+  <title>🔐 Multi-Platform Token Login</title>
   <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
-      font-family: system-ui, sans-serif;
-      max-width: 600px;
-      margin: 40px auto;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #f9fafb;
+      color: #111827;
       padding: 20px;
-      background: #f6f9fc;
-      color: #14171a;
+      line-height: 1.5;
     }
-    h1 { text-align: center; color: #0d1117; }
+    .container {
+      max-width: 650px;
+      margin: 0 auto;
+    }
+    header {
+      text-align: center;
+      margin-bottom: 30px;
+      padding-top: 20px;
+    }
+    h1 {
+      font-size: 28px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+    .subtitle {
+      color: #6b7280;
+      font-size: 16px;
+    }
     .platform {
       background: white;
-      border-radius: 10px;
-      padding: 20px;
-      margin: 20px 0;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 24px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+      border-left: 4px solid #9ca3af;
     }
-    input, button {
+    .platform.twitter { border-left-color: #1d9bf0; }
+    .platform.discord { border-left-color: #5865f2; }
+    .platform.telegram { border-left-color: #0088cc; }
+
+    h2 {
+      font-size: 20px;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    h2 i { font-size: 22px; }
+    input {
       width: 100%;
-      padding: 12px;
-      margin: 8px 0;
+      padding: 12px 14px;
       font-size: 16px;
-      box-sizing: border-box;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      margin: 8px 0 12px;
+      transition: border-color 0.2s;
+    }
+    input:focus {
+      outline: none;
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+    input.error {
+      border-color: #ef4444;
     }
     button {
-      background: #1da1f2;
+      width: 100%;
+      padding: 12px;
+      font-size: 16px;
+      font-weight: 600;
       color: white;
       border: none;
-      border-radius: 6px;
+      border-radius: 8px;
       cursor: pointer;
+      transition: opacity 0.2s;
     }
-    button:hover { opacity: 0.9; }
-    .note {
+    .btn-twitter { background: #1d9bf0; }
+    .btn-discord { background: #5865f2; }
+    .btn-telegram { background: #0088cc; }
+    button:hover { opacity: 0.95; }
+    button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+    .error-msg {
+      color: #ef4444;
       font-size: 14px;
-      color: #657786;
-      margin-top: 15px;
+      margin-top: 6px;
+      min-height: 20px;
     }
-    .discord { border-left: 4px solid #5865f2; }
-    .twitter { border-left: 4px solid #1da1f2; }
-    .telegram { border-left: 4px solid #0088cc; }
+    .note {
+      background: #fff9db;
+      border-left: 3px solid #eab308;
+      padding: 14px;
+      border-radius: 0 8px 8px 0;
+      font-size: 14px;
+      margin-top: 20px;
+      color: #854d0e;
+    }
+    footer {
+      text-align: center;
+      margin-top: 30px;
+      color: #9ca3af;
+      font-size: 13px;
+    }
   </style>
 </head>
 <body>
-  <h1>🔐 Universal Token Login</h1>
+  <div class="container">
+    <header>
+      <h1>🔐 Universal Token Login</h1>
+      <p class="subtitle">Log in to Twitter, Discord & Telegram using session tokens</p>
+    </header>
 
-  <div class="platform twitter">
-    <h3>🐦 Twitter (X)</h3>
-    <p>Enter your <code>auth_token</code> from cookies</p>
-    <input type="text" id="twitter-token" placeholder="e.g. abc123def456..." />
-    <button onclick="loginTwitter()">Login to X.com</button>
+    <!-- Twitter -->
+    <div class="platform twitter">
+      <h2>🐦 Twitter (X)</h2>
+      <p>Enter your <code>auth_token</code> from cookies</p>
+      <input type="text" id="twitter-token" placeholder="e.g. abc123def456..." autocomplete="off">
+      <div class="error-msg" id="twitter-error"></div>
+      <button class="btn-twitter" onclick="login('twitter')">Log in to X.com</button>
+    </div>
+
+    <!-- Discord -->
+    <div class="platform discord">
+      <h2>🎮 Discord</h2>
+      <p>Enter your user <code>token</code> from localStorage</p>
+      <input type="text" id="discord-token" placeholder="e.g. mfa.XXXXX..." autocomplete="off">
+      <div class="error-msg" id="discord-error"></div>
+      <button class="btn-discord" onclick="login('discord')">Log in to Discord</button>
+    </div>
+
+    <!-- Telegram -->
+    <div class="platform telegram">
+      <h2>✈️ Telegram Web</h2>
+      <p>Session injection is manual-only (advanced users)</p>
+      <input type="text" id="telegram-token" placeholder="Not auto-supported – for reference only" disabled>
+      <div class="error-msg" id="telegram-error"></div>
+      <button class="btn-telegram" onclick="login('telegram')">Open Telegram Web</button>
+    </div>
+
+    <div class="note">
+      ⚠️ <strong>Warning:</strong> Your token = full account access. Never use this on untrusted sites.
+      This tool runs 100% in your browser—tokens are never sent to any server.
+    </div>
+
+    <footer>
+      Self-hosted • GitHub Pages • Client-side only
+    </footer>
   </div>
-
-  <div class="platform discord">
-    <h3>🎮 Discord</h3>
-    <p>Enter your <code>token</code> from localStorage</p>
-    <input type="text" id="discord-token" placeholder="e.g. mfa.XXXXX..." />
-    <button onclick="loginDiscord()">Login to Discord</button>
-  </div>
-
-  <div class="platform telegram">
-    <h3>✈️ Telegram Web</h3>
-    <p>Enter your <code>auth_key</code> or session string</p>
-    <input type="text" id="telegram-token" placeholder="Base64 auth_key..." />
-    <button onclick="loginTelegram()">Open Telegram Web (manual paste)</button>
-  </div>
-
-  <p class="note">
-    ⚠️ Your tokens give FULL access to your accounts. Never paste them on sites you don’t own.
-    This page runs 100% in your browser—nothing is sent to a server.
-  </p>
 
   <script>
-    function loginTwitter() {
-      const token = document.getElementById('twitter-token').value.trim();
-      if (!token) return alert('Enter Twitter auth_token');
-      document.cookie = `auth_token=${token}; domain=.x.com; path=/; secure;`;
-      alert('Twitter token injected. Opening x.com...');
-      window.open('https://x.com/home', '_blank');
+    // Error counters per platform to prevent spam
+    const errorCount = {
+      twitter: 0,
+      discord: 0,
+      telegram: 0
+    };
+    const MAX_ERRORS = 3;
+
+    function showError(platform, message) {
+      const el = document.getElementById(`${platform}-error`);
+      const input = document.getElementById(`${platform}-token`);
+      if (el) el.textContent = message;
+      if (input) input.classList.add('error');
     }
 
-    function loginDiscord() {
-      const token = document.getElementById('discord-token').value.trim();
-      if (!token) return alert('Enter Discord token');
-      // Inject into localStorage
-      localStorage.setItem('token', `"${token}"`);
-      alert('Discord token set. Opening discord.com...');
-      window.open('https://discord.com/app', '_blank');
+    function clearError(platform) {
+      const el = document.getElementById(`${platform}-error`);
+      const input = document.getElementById(`${platform}-token`);
+      if (el) el.textContent = '';
+      if (input) input.classList.remove('error');
     }
 
-    function loginTelegram() {
-      const token = document.getElementById('telegram-token').value.trim();
-      if (!token) return alert('Enter Telegram auth_key');
-      alert('Telegram Web does not support direct token login.\n\n1. Go to https://web.telegram.org/\n2. Open DevTools (F12)\n3. In Console, paste a script to replace auth_key (advanced users only).');
-      window.open('https://web.telegram.org/', '_blank');
+    function login(platform) {
+      // Reset error UI
+      clearError(platform);
+
+      // Rate-limit by error count
+      if (errorCount[platform] >= MAX_ERRORS) {
+        showError(platform, `Too many failed attempts. Refresh page to reset.`);
+        return;
+      }
+
+      let token = '';
+      let url = '';
+
+      if (platform === 'twitter') {
+        token = document.getElementById('twitter-token').value.trim();
+        if (!token || token.length < 20) {
+          errorCount.twitter++;
+          showError('twitter', 'Invalid auth_token (too short)');
+          return;
+        }
+        document.cookie = `auth_token=${token}; domain=.x.com; path=/; secure;`;
+        url = 'https://x.com/home';
+
+      } else if (platform === 'discord') {
+        token = document.getElementById('discord-token').value.trim();
+        if (!token || token.length < 50) {
+          errorCount.discord++;
+          showError('discord', 'Invalid Discord token (too short)');
+          return;
+        }
+        try {
+          localStorage.setItem('token', `"${token}"`);
+        } catch (e) {
+          errorCount.discord++;
+          showError('discord', 'Failed to save token (localStorage blocked?)');
+          return;
+        }
+        url = 'https://discord.com/app';
+
+      } else if (platform === 'telegram') {
+        // Telegram Web does not support direct token injection for security
+        alert(
+          '🔒 Telegram Web does not allow automatic token login.\n\n' +
+          'Steps for advanced users:\n' +
+          '1. Go to https://web.telegram.org/\n' +
+          '2. Open DevTools (F12)\n' +
+          '3. Manually replace session data (not recommended for beginners).'
+        );
+        window.open('https://web.telegram.org/', '_blank');
+        return;
+      }
+
+      if (url) {
+        alert(`✅ Token accepted. Opening ${platform}...`);
+        window.open(url, '_blank');
+      }
     }
+
+    // Clear error highlight on input
+    ['twitter', 'discord', 'telegram'].forEach(p => {
+      const input = document.getElementById(`${p}-token`);
+      if (input && !input.disabled) {
+        input.addEventListener('input', () => clearError(p));
+      }
+    });
   </script>
 </body>
 </html>
