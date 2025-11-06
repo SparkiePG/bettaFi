@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Universal Token Login</title>
+  <style>
+    body {
+      font-family: system-ui, sans-serif;
+      max-width: 600px;
+      margin: 40px auto;
+      padding: 20px;
+      background: #f6f9fc;
+      color: #14171a;
+    }
+    h1 { text-align: center; color: #0d1117; }
+    .platform {
+      background: white;
+      border-radius: 10px;
+      padding: 20px;
+      margin: 20px 0;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+    input, button {
+      width: 100%;
+      padding: 12px;
+      margin: 8px 0;
+      font-size: 16px;
+      box-sizing: border-box;
+    }
+    button {
+      background: #1da1f2;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    button:hover { opacity: 0.9; }
+    .note {
+      font-size: 14px;
+      color: #657786;
+      margin-top: 15px;
+    }
+    .discord { border-left: 4px solid #5865f2; }
+    .twitter { border-left: 4px solid #1da1f2; }
+    .telegram { border-left: 4px solid #0088cc; }
+  </style>
+</head>
+<body>
+  <h1>🔐 Universal Token Login</h1>
+
+  <div class="platform twitter">
+    <h3>🐦 Twitter (X)</h3>
+    <p>Enter your <code>auth_token</code> from cookies</p>
+    <input type="text" id="twitter-token" placeholder="e.g. abc123def456..." />
+    <button onclick="loginTwitter()">Login to X.com</button>
+  </div>
+
+  <div class="platform discord">
+    <h3>🎮 Discord</h3>
+    <p>Enter your <code>token</code> from localStorage</p>
+    <input type="text" id="discord-token" placeholder="e.g. mfa.XXXXX..." />
+    <button onclick="loginDiscord()">Login to Discord</button>
+  </div>
+
+  <div class="platform telegram">
+    <h3>✈️ Telegram Web</h3>
+    <p>Enter your <code>auth_key</code> or session string</p>
+    <input type="text" id="telegram-token" placeholder="Base64 auth_key..." />
+    <button onclick="loginTelegram()">Open Telegram Web (manual paste)</button>
+  </div>
+
+  <p class="note">
+    ⚠️ Your tokens give FULL access to your accounts. Never paste them on sites you don’t own.
+    This page runs 100% in your browser—nothing is sent to a server.
+  </p>
+
+  <script>
+    function loginTwitter() {
+      const token = document.getElementById('twitter-token').value.trim();
+      if (!token) return alert('Enter Twitter auth_token');
+      document.cookie = `auth_token=${token}; domain=.x.com; path=/; secure;`;
+      alert('Twitter token injected. Opening x.com...');
+      window.open('https://x.com/home', '_blank');
+    }
+
+    function loginDiscord() {
+      const token = document.getElementById('discord-token').value.trim();
+      if (!token) return alert('Enter Discord token');
+      // Inject into localStorage
+      localStorage.setItem('token', `"${token}"`);
+      alert('Discord token set. Opening discord.com...');
+      window.open('https://discord.com/app', '_blank');
+    }
+
+    function loginTelegram() {
+      const token = document.getElementById('telegram-token').value.trim();
+      if (!token) return alert('Enter Telegram auth_key');
+      alert('Telegram Web does not support direct token login.\n\n1. Go to https://web.telegram.org/\n2. Open DevTools (F12)\n3. In Console, paste a script to replace auth_key (advanced users only).');
+      window.open('https://web.telegram.org/', '_blank');
+    }
+  </script>
+</body>
+</html>
